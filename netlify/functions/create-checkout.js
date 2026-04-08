@@ -13,6 +13,9 @@ exports.handler = async (event) => {
       payment_method_types: ['card'],
       customer_email: email,
       metadata: { supabase_user_id: userId },
+      subscription_data: {
+        metadata: { supabase_user_id: userId }          // ← IMPORTANT pentru subscription events
+      },
       line_items: [
         {
           price_data: {
