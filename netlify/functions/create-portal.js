@@ -29,7 +29,7 @@ exports.handler = async (event) => {
 
     const session = await stripe.billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
-      return_url: `${process.env.URL || 'https://examenmate.netlify.app'}/profil`,
+      return_url: `${process.env.URL || 'https://mate-online.netlify.app'}/profil`,
     });
 
     return {
