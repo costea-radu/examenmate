@@ -30,8 +30,8 @@ exports.handler = async (event) => {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.URL || 'https://examenmate.netlify.app'}/profil?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.URL || 'https://examenmate.netlify.app'}/preturi`,
+      success_url: `${process.env.URL || 'https://mate-online.netlify.app'}/profil?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.URL || 'https://mate-online.netlify.app'}/preturi`,
     });
 
     return {
