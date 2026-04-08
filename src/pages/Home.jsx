@@ -20,7 +20,7 @@ export default function Home() {
       <section className="hero">
         <div className="container hero-content">
           <h1 className="fade-in-up">
-            Matematica devine <span>simplă</span> cu ExamenMate
+            Matematica devine <span>simplă</span> cu Mate-Online
           </h1>
           <p className="fade-in-up delay-1">
             Exerciții PDF, teste interactive și manuale online pentru clasele 5–8,
@@ -95,7 +95,7 @@ export default function Home() {
       <section className="section">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Ce găsești pe ExamenMate</h2>
+            <h2 className="section-title">Ce găsești pe Mate-Online</h2>
             <p className="section-subtitle">
               Trei tipuri de resurse care te ajută să înveți eficient.
             </p>
