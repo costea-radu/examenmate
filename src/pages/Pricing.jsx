@@ -47,7 +47,7 @@ export default function Pricing() {
       <div className="page-header" style={{ textAlign: 'center' }}>
         <div className="container">
           <h1>Abonament Premium</h1>
-          <p>Acces complet la toate materialele ExamenMate</p>
+          <p>Acces complet la toate materialele Mate-Online</p>
         </div>
       </div>
 
