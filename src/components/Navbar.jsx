@@ -24,7 +24,7 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container navbar-inner">
         <Link to="/" className="navbar-logo">
-          <span className="logo-accent">Examen</span>Mate
+          <span className="logo-accent">Mate</span>Online
         </Link>
 
         <button className="mobile-toggle" onClick={() => setOpen(!open)} aria-label="Meniu">
