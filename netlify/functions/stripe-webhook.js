@@ -3,11 +3,17 @@ const { createClient } = require('@supabase/supabase-js');
 
 exports.handler = async (event) => {
   const sig = event.headers['stripe-signature'];
+
+  // Netlify poate trimite body-ul ca base64 — trebuie decodat înainte de verificarea semnăturii
+  const rawBody = event.isBase64Encoded
+    ? Buffer.from(event.body, 'base64')
+    : event.body;
+
   let stripeEvent;
 
   try {
     stripeEvent = stripe.webhooks.constructEvent(
-      event.body,
+      rawBody,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -53,7 +59,8 @@ exports.handler = async (event) => {
       case 'customer.subscription.updated': {
         const subscription = stripeEvent.data.object;
         const customerId = subscription.customer;
-        const status = subscription.status === 'active' ? 'active' : 'inactive';
+        // Tratăm și 'trialing' ca activ
+        const status = ['active', 'trialing'].includes(subscription.status) ? 'active' : 'inactive';
 
         const { error } = await supabase
           .from('profiles')
@@ -82,6 +89,24 @@ exports.handler = async (event) => {
 
         if (error) {
           console.error('Supabase update error (customer.subscription.deleted):', error);
+          return { statusCode: 500, body: 'Database update failed' };
+        }
+
+        break;
+      }
+
+      // Plată eșuată — dezactivăm accesul premium
+      case 'invoice.payment_failed': {
+        const invoice = stripeEvent.data.object;
+        const customerId = invoice.customer;
+
+        const { error } = await supabase
+          .from('profiles')
+          .update({ subscription_status: 'inactive' })
+          .eq('stripe_customer_id', customerId);
+
+        if (error) {
+          console.error('Supabase update error (invoice.payment_failed):', error);
           return { statusCode: 500, body: 'Database update failed' };
         }
 

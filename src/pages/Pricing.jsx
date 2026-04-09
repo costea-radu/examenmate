@@ -1,13 +1,19 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Pricing() {
   const { user, isPremium } = useAuth();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   async function handleSubscribe() {
-    if (!user) return;
+    // Dacă nu e logat, trimite la pagina de înregistrare
+    if (!user) {
+      navigate('/inregistrare');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch('/.netlify/functions/create-checkout', {
@@ -16,13 +22,14 @@ export default function Pricing() {
         body: JSON.stringify({ userId: user.id, email: user.email }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
+        throw new Error(data.error || `Server error: ${response.status}`);
       }
 
-      const { url, error } = await response.json();
-      if (error) throw new Error(error);
-      if (url) window.location.href = url;
+      if (data.error) throw new Error(data.error);
+      if (data.url) window.location.href = data.url;
     } catch (err) {
       console.error('Checkout error:', err);
       alert('A apărut o eroare. Încearcă din nou.');
@@ -41,13 +48,14 @@ export default function Pricing() {
         body: JSON.stringify({ userId: user.id }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
+        throw new Error(data.error || `Server error: ${response.status}`);
       }
 
-      const { url, error } = await response.json();
-      if (error) throw new Error(error);
-      if (url) window.location.href = url;
+      if (data.error) throw new Error(data.error);
+      if (data.url) window.location.href = data.url;
     } catch (err) {
       console.error('Portal error:', err);
       alert('A apărut o eroare la deschiderea portalului. Încearcă din nou.');
@@ -104,19 +112,15 @@ export default function Pricing() {
                   {loading ? 'Se încarcă...' : 'Gestionează abonamentul'}
                 </button>
               </div>
-            ) : user ? (
+            ) : (
               <button
                 className="btn btn-primary btn-lg"
                 style={{ width: '100%' }}
                 onClick={handleSubscribe}
                 disabled={loading}
               >
-                {loading ? 'Se procesează...' : 'Abonează-te acum'}
+                {loading ? 'Se procesează...' : user ? 'Abonează-te acum' : 'Creează cont și abonează-te'}
               </button>
-            ) : (
-              <Link to="/inregistrare" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
-                Creează cont și abonează-te
-              </Link>
             )}
           </div>
 
