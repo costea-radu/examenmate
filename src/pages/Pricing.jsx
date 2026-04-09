@@ -22,17 +22,25 @@ export default function Pricing() {
         body: JSON.stringify({ userId: user.id, email: user.email }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || `Server error: ${response.status}`);
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error(`Răspuns invalid de la server (status ${response.status})`);
       }
 
-      if (data.error) throw new Error(data.error);
-      if (data.url) window.location.href = data.url;
+      if (!response.ok || data.error) {
+        throw new Error(data.error || `Eroare server: ${response.status}`);
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('Nu s-a primit URL de plată de la server.');
+      }
     } catch (err) {
       console.error('Checkout error:', err);
-      alert('A apărut o eroare. Încearcă din nou.');
+      alert(`A apărut o eroare: ${err.message}`);
     } finally {
       setLoading(false);
     }
