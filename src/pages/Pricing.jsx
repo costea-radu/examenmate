@@ -10,12 +10,18 @@ export default function Pricing() {
     if (!user) return;
     setLoading(true);
     try {
-      const response = await fetch('/api/create-checkout', {
+      const response = await fetch('/.netlify/functions/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, email: user.email }),
       });
-      const { url } = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const { url, error } = await response.json();
+      if (error) throw new Error(error);
       if (url) window.location.href = url;
     } catch (err) {
       console.error('Checkout error:', err);
@@ -26,17 +32,25 @@ export default function Pricing() {
   }
 
   async function handleManage() {
+    if (!user) return;
     setLoading(true);
     try {
-      const response = await fetch('/api/create-portal', {
+      const response = await fetch('/.netlify/functions/create-portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id }),
       });
-      const { url } = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const { url, error } = await response.json();
+      if (error) throw new Error(error);
       if (url) window.location.href = url;
     } catch (err) {
       console.error('Portal error:', err);
+      alert('A apărut o eroare la deschiderea portalului. Încearcă din nou.');
     } finally {
       setLoading(false);
     }

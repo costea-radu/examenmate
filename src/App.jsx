@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -13,8 +14,10 @@ import Pricing from './pages/Pricing';
 import Profile from './pages/Profile';
 
 function ScrollToTop() {
-  const { pathname } = window.location;
-  window.scrollTo(0, 0);
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   return null;
 }
 
@@ -22,6 +25,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ScrollToTop />
         <Navbar />
         <main style={{ minHeight: 'calc(100vh - 68px - 200px)' }}>
           <Routes>

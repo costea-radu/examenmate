@@ -25,10 +25,15 @@ exports.handler = async (event) => {
     switch (stripeEvent.type) {
       case 'checkout.session.completed': {
         const session = stripeEvent.data.object;
-        const userId = session.metadata.supabase_user_id;
+        const userId = session.metadata?.supabase_user_id;
         const customerId = session.customer;
 
-        await supabase
+        if (!userId) {
+          console.error('checkout.session.completed: supabase_user_id lipsește din metadata');
+          return { statusCode: 400, body: 'Missing supabase_user_id in metadata' };
+        }
+
+        const { error } = await supabase
           .from('profiles')
           .update({
             stripe_customer_id: customerId,
@@ -36,6 +41,11 @@ exports.handler = async (event) => {
             subscription_id: session.subscription,
           })
           .eq('id', userId);
+
+        if (error) {
+          console.error('Supabase update error (checkout.session.completed):', error);
+          return { statusCode: 500, body: 'Database update failed' };
+        }
 
         break;
       }
@@ -45,10 +55,15 @@ exports.handler = async (event) => {
         const customerId = subscription.customer;
         const status = subscription.status === 'active' ? 'active' : 'inactive';
 
-        await supabase
+        const { error } = await supabase
           .from('profiles')
           .update({ subscription_status: status })
           .eq('stripe_customer_id', customerId);
+
+        if (error) {
+          console.error('Supabase update error (customer.subscription.updated):', error);
+          return { statusCode: 500, body: 'Database update failed' };
+        }
 
         break;
       }
@@ -57,13 +72,18 @@ exports.handler = async (event) => {
         const subscription = stripeEvent.data.object;
         const customerId = subscription.customer;
 
-        await supabase
+        const { error } = await supabase
           .from('profiles')
           .update({
             subscription_status: 'inactive',
             subscription_id: null,
           })
           .eq('stripe_customer_id', customerId);
+
+        if (error) {
+          console.error('Supabase update error (customer.subscription.deleted):', error);
+          return { statusCode: 500, body: 'Database update failed' };
+        }
 
         break;
       }

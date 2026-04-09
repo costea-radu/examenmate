@@ -29,14 +29,22 @@ export function AuthProvider({ children }) {
 
   async function fetchProfile(userId) {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-      setProfile(data);
+
+      if (error) {
+        // Profilul nu există încă (ex: trigger SQL nu a rulat) — nu e o eroare fatală
+        console.warn('Profile not found for user:', userId, error.message);
+        setProfile(null);
+      } else {
+        setProfile(data);
+      }
     } catch (err) {
       console.error('Profile fetch error:', err);
+      setProfile(null);
     } finally {
       setLoading(false);
     }

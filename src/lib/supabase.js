@@ -4,10 +4,10 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials missing. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+  throw new Error(
+    'Lipsesc variabilele de mediu Supabase. ' +
+    'Asigură-te că ai setat VITE_SUPABASE_URL și VITE_SUPABASE_ANON_KEY în fișierul .env'
+  );
 }
 
-export const supabase = createClient(
-  supabaseUrl || 'https://stpmujlxizceelltyxyv.supabase.co',
-  supabaseAnonKey || 'placeholder'
-);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);

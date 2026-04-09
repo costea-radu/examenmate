@@ -27,16 +27,28 @@ export default function Profile() {
 
   async function handleManageSubscription() {
     try {
-      const response = await fetch('/api/create-portal', {
+      const response = await fetch('/.netlify/functions/create-portal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id }),
       });
-      const { url } = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      const { url, error } = await response.json();
+      if (error) throw new Error(error);
       if (url) window.location.href = url;
     } catch (err) {
       console.error('Portal error:', err);
+      alert('A apărut o eroare la deschiderea portalului. Încearcă din nou.');
     }
+  }
+
+  async function handleSignOut() {
+    await signOut();
+    navigate('/');
   }
 
   return (
@@ -137,7 +149,7 @@ export default function Profile() {
             <button
               className="btn btn-outline btn-sm"
               style={{ marginTop: 24 }}
-              onClick={() => { signOut(); navigate('/'); }}
+              onClick={handleSignOut}
             >
               Deconectare
             </button>

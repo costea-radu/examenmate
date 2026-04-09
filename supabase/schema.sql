@@ -65,15 +65,12 @@ CREATE POLICY "Users can update own profile"
   USING (auth.uid() = id);
 
 -- Politici pentru content
--- Conținutul gratuit: vizibil pentru toți utilizatorii autentificați
-CREATE POLICY "Free content visible to all authenticated"
+-- CORECȚIE: Conținutul gratuit e vizibil pentru TOȚI (inclusiv vizitatori neautentificați)
+CREATE POLICY "Free content visible to everyone"
   ON public.content FOR SELECT
-  USING (
-    is_free = true
-    AND auth.role() = 'authenticated'
-  );
+  USING (is_free = true);
 
--- Conținutul premium: vizibil doar pentru abonați
+-- Conținutul premium: vizibil doar pentru abonați activi
 CREATE POLICY "Premium content visible to subscribers"
   ON public.content FOR SELECT
   USING (
